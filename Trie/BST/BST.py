@@ -47,6 +47,17 @@ class Tree:
             iterate(current.right, result)
             return result
         return iterate(self.root, [])
+    
+    def show(self):
+        def iterate(current):
+            if not current:
+                return
+            
+            iterate(current.left)
+            print(current.value, end=' ')
+            iterate(current.right)
+
+        iterate(self.root)
 
     def find(self, val):
         current = self.root
@@ -96,7 +107,7 @@ class Tree:
             if not current:
                 return
             if not current.left:
-                return current.value
+                return current
             return iterate(current.left)
         return iterate(self.root) if not target else iterate(target)
     
@@ -149,8 +160,7 @@ class Tree:
         target = ansessors.pop()
 
         if target.right:
-            min_val = self.smallest(target.right)
-            return min_val
+            return self.smallest(target.right)
         
         parent = ansessors.pop()
 
@@ -164,7 +174,7 @@ class Tree:
                 return None 
             return parent.value
         elif parent.left and parent.left.value == target.value:
-            return parent.value
+            return parent
 
         return None
     
@@ -182,6 +192,19 @@ class Tree:
             else:
                 if current._is_leaf():
                     return None
+                if current.left and not current.right or not current.left and current.right :
+                    if current.left:
+                        return current.left
+                    else:
+                        return current.right
+                else:
+                    successor = self.successor(current.value)
+                    current.value = successor.value
+
+                    iterate(current.right, successor.value)
+                    return current
+
+                
 
         iterate(self.root, val)
 
@@ -196,10 +219,13 @@ class Tree:
 tr = Tree(10)
 tr.add([2, 1], ['L', 'L'])
 tr.add([2, 5], ['L', 'R'])
-tr.add([13], ['R'])
-print(tr.pree_order_arr())
-tr.delete(13)
-print(tr.pree_order_arr())
+tr.add([14, 18, 20], ['R', 'R', 'R'])
+tr.add([14, 18, 16], ['R', 'R', 'L'])
+tr.add([14, 12, 11], ['R', 'L', 'L'])
+tr.add([14, 12, 13], ['R', 'L', 'R'])
+print(tr.show())
+tr.delete(14)
+print(tr.show())
 
 ### Checkpoint
 # we debuf the first condition only r
