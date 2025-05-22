@@ -8,6 +8,11 @@ class Node:
         self.right = right
         self.value = value
 
+    def _is_leaf(self):
+        return not self.left and not self.right
+
+
+
 
 class Tree:
 
@@ -33,19 +38,31 @@ class Tree:
                     raise TypeError(f"Right not correct for {value}")
                 prev = prev.right
 
-    def pree_order_arr(self, current, result = []):
-        if not current:
-            return
-        result.append(current.value)
-        self.pree_order_arr(current.left)
-        self.pree_order_arr(current.right)
-        return result
+    def pree_order_arr(self):
+        def iterate(current, result):
+            if not current:
+                return
+            result.append(current.value)
+            iterate(current.left, result)
+            iterate(current.right, result)
+            return result
+        return iterate(self.root, [])
 
     def find(self, val):
         current = self.root
         while current:
             if current.value == val:
                 return self.pree_order_arr(current)
+            elif current.value < val:
+                current = current.right
+            else:
+                current = current.left
+
+    def _find_node(self, val):
+        current = self.root
+        while current:
+            if current.value == val:
+                return current
             elif current.value < val:
                 current = current.right
             else:
@@ -150,6 +167,26 @@ class Tree:
             return parent.value
 
         return None
+    
+    def delete(self, val):
+        def iterate(current, val):
+
+            if not current:
+                return current
+        
+
+            if current.value > val:
+                current.left = iterate(current.left, val)
+            elif current.value < val:
+                current.right = iterate(current.right, val)
+            else:
+                if current._is_leaf():
+                    return None
+
+        iterate(self.root, val)
+
+        
+
 
 
     
@@ -160,7 +197,10 @@ tr = Tree(10)
 tr.add([2, 1], ['L', 'L'])
 tr.add([2, 5], ['L', 'R'])
 tr.add([13], ['R'])
-print(tr.successor(5))
+print(tr.pree_order_arr())
+tr.delete(13)
+print(tr.pree_order_arr())
+
 ### Checkpoint
 # we debuf the first condition only r
 
