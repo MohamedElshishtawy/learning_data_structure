@@ -5,7 +5,7 @@ class MinHeap:
 
     def __init__(self, lst=None):
         if lst:
-            self.heap = lst
+            self.heap = lst.copy()
             self.size = len(lst)
             self._heapify()
 
@@ -15,6 +15,7 @@ class MinHeap:
             self._heapify_down(i)
         
 
+
     def _size(self):
         return self.size
     
@@ -23,17 +24,19 @@ class MinHeap:
         return self.heap[0]
     
     def _parent_index(self, node_index):
-        return math.floor((node_index-1) / 2) if node_index > 0 else -1
+        return (node_index-1) // 2 if node_index > 0 else -1
     
     def _left_child_index(self, node_index):
-        if node_index >= math.floor(self.size/2) :
+        if node_index >= self.size//2 :
             return -1 
-        return 2*node_index+1 if node_index < self.size else -1 
+        pos = 2*node_index+1
+        return pos if pos < self.size else -1 
     
     def _right_child_index(self, node_index):
         if node_index >= math.floor(self.size/2) :
             return -1 
-        return 2*node_index+2 if node_index < self.size else -1 
+        pos = 2*node_index+2
+        return pos if pos < self.size else -1 
 
     def _fix(self, index):
         assert index >= 0 and index <= len(self.heap)
@@ -61,10 +64,30 @@ class MinHeap:
         if right_child_index != -1 and self.heap[child_index] > self.heap[right_child_index]:
             child_index = right_child_index
         
-        if self.heap[index] > self.heap[child_index]:
-             parent = self.heap[index]
-             self.heap[index], self.heap[child_index] = self.heap[child_index], parent
-             return self._heapify_down(child_index)
+        parent = self.heap[index]
+        if parent > self.heap[child_index]:
+            self.heap[index], self.heap[child_index] = self.heap[child_index], parent
+            return self._heapify_down(child_index)
+        
+    def _is_heap(self):
+        # complete
+        # the parent is smalle than the two child
+        def is_smallest(pos):
+            if pos == -1:
+                return True
+            
+            right_pos = self._right_child_index(pos)
+            left_pos  = self._left_child_index(pos)
+
+            if right_pos != -1 and self.heap[pos] > self.heap[right_pos]:
+                return False
+            if left_pos != -1 and self.heap[pos] > self.heap[right_pos]:
+                return False
+            
+            return is_smallest(right_pos) and is_smallest(left_pos)
+        
+        return is_smallest(0)
+
 
     ## --- public ---  
 
@@ -79,22 +102,41 @@ class MinHeap:
     
     def pop(self): # remove top element
         assert not self.is_empity()
-
-        if self.size == 1:
-            top    =  self._top()
-            self.heap = []
-            return top 
-
-        top = self.heap[0]
-
-        self.heap[0] = self.heap[self.size-1]
-        
         self.size -= 1
+        top = self.heap[0]
+        self.heap[0] = self.heap[self.size]
         self._heapify_down(0)
-        self.heap[self.size] = None
+        self.heap[self.size] = top
         return top 
+    
+    def find_smaller_values(self, value):
+        assert not self.is_empity()
+        values = []
+        
+        def process(pos):
+            
+            if pos == -1 or pos >= self.size or self.heap[pos] >= value:
+                return
+
+            values.append(self.heap[pos])
+            process(self._left_child_index(pos)) 
+            process(self._right_child_index(pos))
+         
+        process(0)
+        return values
+    def heap_sort(self):
+        for i in range(self.size):
+            self.pop()
+        self.heap.reverse()
+        return True
         
 
-min_heap = MinHeap([10,3,5,1,100])
-min_heap.pop()
-print(min_heap.heap)
+        
+        
+
+
+        
+
+min_heap = MinHeap([10,3,5,88,1,100])
+
+# print(min_heap.find_smaller_values(10))
