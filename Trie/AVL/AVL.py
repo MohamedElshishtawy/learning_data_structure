@@ -5,14 +5,21 @@ class Node:
         self.left   = left
         self.right  = right
         self.height = 1
+        self.count  = 1
 
     def _child_height(self, child):
         if not child:
             return -1
         return child.height 
     
+    def child_count(self, child):
+        if not child:
+            return 0
+        return child.count
+    
     def _update_height(self):
         self.height = 1 + max(self._child_height(self.left), self._child_height(self.right))
+        self.count  = 1 + self.child_count(self.left) + self.child_count(self.right) 
 
     def balance_factor(self):
         return self._child_height(self.left) - self._child_height(self.right)
@@ -208,7 +215,7 @@ class AVL:
             if current.value <= val:
                 return process(val, current.right)
             else: 
-                return 1 + process(val, current.right) + process(val, current.left) 
+                return 1 + current.child_count(current.right) + process(val, current.left) 
         
         return process(val, self.root)
 
