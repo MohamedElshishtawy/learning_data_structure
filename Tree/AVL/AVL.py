@@ -218,6 +218,17 @@ class AVL:
                 return 1 + current.child_count(current.right) + process(val, current.left) 
         
         return process(val, self.root)
+    
+    def max_node(self):
+        def process(current):
+            if not current:
+                return None
+            
+            if current.right:
+                return process(current.right)
+            
+            return current
+        return process(self.root)
 
 
 
